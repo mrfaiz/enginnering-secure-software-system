@@ -1,0 +1,23 @@
+(* incomplete.pv: ProVerif incompleteness Example *)
+
+(* Shared key encryption *)
+type key.
+fun senc(bitstring,key): bitstring.
+reduc forall x: bitstring, y: key; sdec(senc(x,y),y) = x.
+
+
+free c: channel.
+free FAIL: bitstring[private].
+query attacker(FAIL).
+
+
+process
+   new k:key;
+   out(c,senc(senc(FAIL,k),k));
+   in(c, x:bitstring);
+   out(c, sdec(x,k));
+   in(c, x:bitstring);
+   out(c, sdec(x,k))
+   
+   
+   

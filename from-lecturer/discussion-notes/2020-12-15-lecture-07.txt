@@ -1,0 +1,31 @@
+ESSS December 15, 2020
+----------------------
+
+  - questions about last week (lecture 6, Rusinowitch Turuani proof)
+  
+     - DAG construction:
+       - where does our model rule out "cycles" like sigma(x)=hash(x)?
+       - does the proof use the fact that the term t from the parsing lemma is not a variable?
+       
+     - NP hardness:
+       - what about the case where the adversary can activate instances more than once?
+       
+PCP instance:
+
+    Piece 1        Piece 2         Piece 3
+x: 0010101        0010100110101    01010000101 
+y: 00110111101    11010101001      101010001
+
+Question: can we find indices so that adding pieces gives the same x and y strings?
+
+index sequence 132:
+
+x = 0010101010100001010010100110101
+y = 0011011110110101000111010101001
+       
+assume:
+
+     UNBOUNDED-INSECURITY is semidecidable
+and  UNBOUNDED-SECURITY is semidecidable
+
+then: UNBOUNDED-INSECURITY decidable, contradiction

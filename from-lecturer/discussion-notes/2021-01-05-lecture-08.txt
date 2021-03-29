@@ -1,0 +1,16 @@
+ESSS January 5, 2021
+--------------------
+
+  - questions about last week (lecture 7)
+  
+     - PCP reduction (for undecidability): 
+       - very similar to NP-hardness, can we also show undecidability of INSECURE with this?
+       - (only for students with crypto background): which property of crypto schemes do we use here?
+       
+  equational theories:
+  
+  encA(k_B)(secret-message)
+  
+  decA(hat k_A)(encA(k_B)(secret-message)): no "simplification step" applicable (no equation applies)
+  
+  f(hash(x))

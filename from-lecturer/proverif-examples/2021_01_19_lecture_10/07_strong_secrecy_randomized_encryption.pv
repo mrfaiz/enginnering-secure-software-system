@@ -1,0 +1,34 @@
+(* strong_secrecy_randomized_encryption.pv: Attempting Strong Secrecy with Randomized Public-Key Encryption in ProVerif *)
+
+(* Asymmetric key encryption *)
+type skey.
+type pkey.
+type coins.
+
+fun pk (skey): pkey.
+fun internalaenc(bitstring, pkey, coins): bitstring.
+
+reduc forall m:bitstring, k:skey, r:coins; adec(internalaenc(m,pk(k),r),k)=m.
+letfun aenc(x:bitstring, y:pkey) = new r:coins; internalaenc(x,y,r).
+reduc forall m:bitstring, pk:pkey, r:coins; getkey(internalaenc(m,pk,r))=pk.
+
+free yes:bitstring[private].
+free no:bitstring[private].
+
+free c: channel.
+
+let clientAlice(which:bool, pkB:pkey) =
+    if which then
+       out(c, aenc(yes, pkB))
+    else
+       out(c, aenc(no, pkB)).
+    
+
+process
+     new skB:skey;
+	 let pkB = pk(skB) in 
+	 out(c,pkB);
+	 out(c, yes);
+	 out(c, no);
+     clientAlice(choice[true,false], pkB)
+  

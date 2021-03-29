@@ -1,0 +1,70 @@
+(* this is the broken authentication protocol from the first exercise:
+
+ A -> B: (enc^a_{kB}(NA), enc^a_{kB}(A))
+ B -> A: (enc^a_{kA}(NA,NB), enc^a_{kA}(B))
+ 
+ A -> B: enc^s_{(NA,NB), FAIL}
+ 
+ From then on, A and B use N_A as sesssion key. We model this by letting 
+ A encrypt the value FAIL with N_A after the protocol run completed.
+ For this purpose, we let N_A be of type key.
+*)
+
+(* asymmetric encryption, key always first argument *)
+
+type skey.
+type pkey.
+fun pk(skey): pkey.
+fun aenc(pkey, bitstring): bitstring.
+reduc forall m: bitstring, sk: skey; adec(sk, aenc(pk(sk), m)) = m.
+
+(* symmetric encryption *)
+
+fun senc(bitstring, bitstring): bitstring.
+reduc forall m: bitstring, k:bitstring; sdec(k, senc(k,m)) = m. 
+
+(* channel *)
+free c:channel.
+free FAIL:bitstring[private].
+
+(* names *)
+free A:bitstring.
+free B:bitstring.
+free C:bitstring.
+
+(* security property *)
+query attacker(FAIL).
+
+let clientA(pkA:pkey, skA:skey, idA:bitstring, pkB:pkey, idB:bitstring) =
+    new NA:bitstring;
+    out(c, (aenc(pkB, NA), aenc(pkB, idA)));
+    in(c, x:bitstring);
+    let (lhs:bitstring, rhs:bitstring) = x in 
+      let lhsDec = adec(skA, lhs) in
+        let rhsDec = adec(skA, rhs) in
+          let (=NA, NB:bitstring) = lhsDec in
+            let (=idB) = rhsDec in 
+              out(c, senc((NA,NB),FAIL)).
+       
+let clientB(pkB:pkey, skB:skey, idB:bitstring, pkA:pkey, idA:bitstring) =
+   new NB:bitstring;
+   in(c, msg1:bitstring);
+   let (lhs:bitstring, rhs:bitstring) = msg1 in
+     let NA = adec(skB, lhs) in
+        let (=idA) = (adec(skB, rhs)) in
+          out (c, (aenc(pkA, (NA,NB)), aenc(pkA,idB))).
+   
+process
+    new skA:skey;
+    new skB:skey;
+    new skC:skey;
+    let pkA = pk(skA) in 
+      let pkB = pk(skB) in 
+        let pkC = pk(skC) in
+          out(c, pkA);
+          out(c, pkB);
+          out(c, pkC);
+          out(c, skC);
+          (!clientA(pkA, skA, A, pkB, B) | !clientB(pkB, skB, B, pkA, A))
+    
+      

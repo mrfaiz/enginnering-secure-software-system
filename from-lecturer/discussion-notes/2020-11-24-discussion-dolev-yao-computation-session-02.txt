@@ -1,0 +1,20 @@
+ESSS November 24, 2020: Discussion Session Dolev-Yao Computation
+----------------------------------------------------------------
+
+Review Questions (about slides from video)
+
+  - Slide "Algorithm for Derive"
+  
+  S = { [FAIL, epsilon], [epsilon, epsilon, epsilon, epsilon] }
+  
+  m = FAIL
+  
+  derivation: first split up sequence, then pair (here we could just remove sequence-splitting steps)
+  
+  
+  S = { [FAIL, epsilon], [epsilon, \encA_{k_C}(\encA_{k_C}(\encA_{k_C}(\encA_{k_C}(\encA_{k_C}(\encA_{k_C}(FAIL)))))),epsilon, epsilon, epsilon], ^k_C }
+  
+  m = FAIL
+  
+  derivation: use the second sequence
+  

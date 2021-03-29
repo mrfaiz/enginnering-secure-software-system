@@ -1,0 +1,50 @@
+(* Fixed version of the protocol *)
+
+(* asymmetric encryption, key always first argument *)
+
+type skey.
+type pkey.
+fun pk(skey): pkey.
+fun aenc(pkey, bitstring): bitstring.
+reduc forall m: bitstring, sk: skey; adec(sk, aenc(pk(sk), m)) = m.
+
+(* symmetric encryption *)
+
+fun senc(bitstring, bitstring): bitstring.
+reduc forall m: bitstring, k:bitstring; sdec(k, senc(k,m)) = m. 
+
+(* channel *)
+free c:channel.
+free FAIL:bitstring[private].
+
+(* security property *)
+query attacker(FAIL).
+
+let clientA(pkA:pkey, skA:skey, pkB:pkey) =
+    new NA:bitstring;
+    out(c, (pkA, aenc(pkB, (pkA,pkB,NA))));
+    in(c, x:bitstring);
+    let y = adec(skA, x) in
+      let (=pkB, =NA) = y in
+       out(c, senc(NA,FAIL)).
+       
+let clientB(pkB:pkey, skB:skey, pkA:pkey) =
+   in(c, x: bitstring);
+   let y = adec(skB, x) in
+     let (=pkA, =pkB, NA:bitstring) = y in
+       out (c, aenc(pkA, (pkA,pkB,NA))).
+   
+process
+    new skA:skey;
+    new skB:skey;
+    new skC:skey;
+    let pkA = pk(skA) in 
+      let pkB = pk(skB) in 
+        let pkC = pk(skC) in
+          out(c, pkA);
+          out(c, pkB);
+          out(c, pkC);
+          out(c, skC);
+          (!clientA(pkA, skA, pkB) | !clientB(pkB, skB, pkA))
+    
+      

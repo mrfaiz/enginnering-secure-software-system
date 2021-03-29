@@ -1,0 +1,48 @@
+ESSS November 17, 2020
+----------------------
+
+Review Questions (about slides from previous lectures)
+
+  - Slide "Cryptographic Primitives: Signatures"
+  
+  - Slide "Cryptographic Primitives: Hash Functions"
+  
+  - Slide "An Example: Authentication"
+  
+  - Slide "Attack on Needham-Schroeder"  
+  
+  - Slide "Model Requirements: Generalizing from Needham-Schroeder Example"
+    - over-approximation is better, since false positives are better than false negatives for security
+  
+  - Slide "Terms: Tree Representation"
+     - the tree uses "nested pairs" which the term definition does not cover
+     - can we "ignore" the nested-pairs-issue? Yes.
+     - second issue?
+  
+  - Slide "Definition: Subterms"  
+  
+  - Slide "Definition: Dolev-Yao Closure"    
+  
+"Live Examples"
+
+  - Slide "Definition: Substitutions"
+  
+    example: 
+       sigma(x) = encS_{k_AB}{m}
+       sigma(y) = [N_A,N_B,N_C]
+       sigma(z) = encA_{k_C}
+       sigma(v) = v for all other variables v
+       
+       t = sig_{k_A}{x,request,y}
+       
+       sigma(t) = sig_{k_A}{encS_{k_AB}{m},request,[N_A,N_B,N_C]}
+       
+  - Non-working example:
+    1. epsilon           --> encA_{k_B}{N_A,ok}
+    2. encA_{k_A}{N_A,x} --> encA_{k_B}{N_A,x,y}
+    
+  - Needham Schroeder formalization:
+    initial adversary knowledge: I = { ^k_C, k_A, k_B, k_C, N_C^1, N_C^2, ... } 
+    
+       
+    

@@ -1,0 +1,87 @@
+(* asymmetric encryption, key always first argument *)
+
+type skey.
+type pkey.
+
+fun pk(skey): pkey.
+fun aenc(pkey, bitstring): bitstring.
+
+reduc forall m: bitstring, sk: skey; adec(sk, aenc(pk(sk), m)) = m.
+
+free c:channel.
+
+free FAIL:bitstring [private].
+
+query attacker(FAIL).
+
+let clientInitiator(pkA:pkey, skA:skey, pkB:pkey) =
+   
+   (* Step 1: A->B: enc^a_{pkB}(pkA, N_A) (use pkA instead of A to represent Alice's identity) *)
+   new NA: bitstring;
+   out(c, aenc(pkB, (pkA, NA)));
+   
+    (* Step 2: Alice expects enc^a_{k_A}(N_A, x)
+                    replies enc^a_{K_B}(x) *)
+                 
+   in(c, y:bitstring);
+   let (=NA, x:bitstring) = adec(skA, y) in
+     out(c, aenc(pkB, x)).
+     
+let clientResponder(pkB: pkey, skB: skey, pkA: pkey, testSession:bool) =
+   (* Step 1: Bob expects enc^a_{pkB}(pkA, x) 
+                  replies enc^a_{pkA}(x, NB)  *)
+   
+   in (c, y:bitstring);
+   let (=pkA, x:bitstring) = adec(skB, y) in
+     new NB: bitstring;
+     out(c, aenc(pkA, (x, NB)));
+     
+ (* Step 2: (break-rule): If Bob receives pair (NA, NB) in a "test session," attack was successful *)
+     in (c, z: bitstring);
+     let (=x, =NB) = z in
+       if testSession = true then
+         out (c, FAIL).
+         
+let startHonestInitiatorWithADV(pkA: pkey, skA: skey) =
+  new skC:skey;
+  out (c, skC);
+  let pkC = pk(skC) in
+    clientInitiator(pkA, skA, pkC).
+
+let startHonestResponderWithADV(pkB: pkey, skB: skey) =
+  new skC:skey;
+  out (c, skC);
+  let pkC = pk(skC) in
+    clientResponder(pkB, skB, pkC, false).
+    
+
+process
+  new skA:skey;
+  new skB:skey;
+  new skC:skey;
+  let pkA = pk(skA) in
+    let pkB = pk(skB) in
+      let pkC = pk(skC) in 
+        out (c,pkA);
+        out (c,pkB);
+        out (c,skC);
+          (! startHonestInitiatorWithADV(pkA, skA))
+        | (! startHonestInitiatorWithADV(pkB, skB))
+        | (! startHonestResponderWithADV(pkA, skA))
+        | (! startHonestResponderWithADV(pkB, skB))
+        | clientResponder(pkB, skB, pkA, true)
+        
+        (* only responder between alice and bob as "honest session": only here we have the break rule. Security analysis for the 
+           initiater would be done seperately.
+           
+           this modeling lets proverif detect the attack completely automatically: start session with a/c, session with a/b, and
+           run the attack as identified manually.
+           
+Take-Aways:
+  - be careful in modeling:
+    - you can have "too few" possibilities for the adversary: only a/b session does not allow to find attack
+    - mismatches in protocol (skipped), fixed pkA/pkB mixup
+    - too many possibilities for adv: If Alice releases FAIL to Charlie in "regular" session, this is not an attack
+  - correct modeling of responder security of NS: this file.  
+*) 
+        

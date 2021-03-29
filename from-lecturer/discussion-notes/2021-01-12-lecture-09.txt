@@ -1,0 +1,44 @@
+ESSS January 12, 2021
+---------------------
+      
+  - questions about last week (lecture 8)
+       
+     - three ways to specify crypto primitives: dy / stepwise derivations / equational theories.
+       Advantages / disadvatnages of definitions?
+       
+       YES (4-5): eq theories are more natural 
+       NO  (1-2): DY style modeling is more natural
+       
+     - notation in ProVerif: more operational, more natural. Why not used in theoretical model?
+     
+       saves time
+     
+     - Bob's process in Handshake protocol: point of last line?
+
+       
+t = dec(enc(N_A,k),k)
+
+t --> N_A
+
+t =_{E} N_A
+
+equational theory:
+
+x = x
+
+t --> t
+
+for equational theories that do not have a step t --> t ("simplification" that does not change anything), definition is equivalent to:
+
+t in normal form if there is NO t' with t --> t'
+
+takeaway: t in normal form if you cannot simplify t further,
+                            <=> any "simplification step" to t' does not help you
+                            <=> for any such step, t' is just t again (so no real simplification)
+                            
+A term t is NOT in normal form, if you can simplify it:
+    <=> there is a step t ==> t' with t' "simpler" than t
+    <=> (same for convergent subterm theories only) there is a step t ==> t' with t' different from t
+    
+    
+    

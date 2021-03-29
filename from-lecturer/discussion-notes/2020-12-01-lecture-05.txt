@@ -1,0 +1,27 @@
+ESSS December 01, 2020
+----------------------
+
+Review Questions (about slides from previous lectures)
+
+  - questions about lecture three and before (skipped last week)
+  
+     - Slide "Matching: Applying Receive/Send Actions"  
+   
+     - Slide "Matching: Example"
+  
+     - Slide "Formal Protocol Definition"
+       - order of messages is missing, why? controlled by adv
+       - receiver
+  
+     - Slide "Formal Representation of Needham-Schroeder I"  
+       - 
+  
+     - Slide "Protocol Model"    
+     
+  - questions about last week (lecture 4)     
+  
+     - Slide "Executing Instances II"
+     
+     - Slide "Successful Attack: Definition"
+       - always fwd messages to intended receiver, \sigma(x) must "match" some (specific) part constructed in an r/s rule. 
+   

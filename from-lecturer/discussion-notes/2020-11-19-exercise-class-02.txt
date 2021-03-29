@@ -1,0 +1,96 @@
+ESSS exercise November 19, 2020
+-------------------------------
+
+A -> B (A,encA_{kB}(N_A))
+
+     B -> C (A,encA_{kC}(N_A))
+
+     B <- C (C,encA_{kA}(N_A))
+     
+     Bob: knows N_A
+     Alice: thinks N_A is secure for A <-> B
+     Charlie: thinks N_A is secure for A <-> C
+       --> Charlie is attacked successfully
+     
+"bugs in the protocol":
+   - Bob (receiver) does not get any guarantees about Alice"s (initiators) identity
+   
+   - receiver (Bob) does not add his name/identity to the message under crypto protection
+   
+   formal protocol representation from lecture:
+   
+   Bob's instance:
+  
+   (A,encA_{k_B}(x)) --> (B,encA_{k_A}(x))
+   
+   Proposed fix: add identity to second message
+   
+   Alice's instance:
+     epsilon --> encA_{k_B}(A, N_A)
+   
+   Bob's instance:
+     encA_{k_B}(A, x) --> encA_{k_A}(B, x)
+  
+A -> B: encA_{k_B}(A, N_A)
+
+     B -> C encA_{k_C}(A, N_A)
+
+     B <- C encA_{k_A}(C, N_A)
+     
+     Bob: knows N_A
+     Alice: thinks N_A is secure for A <-> B
+     Charlie: thinks N_A is secure for A <-> C
+     
+     receiver (Charlie) still does not get any guarantees
+     
+     attack still works because sender does not authenticate herself to the receiver, so receiver does not get any guarantees.
+     
+---------- ADDING SIAGNATURES     
+     
+DY: sig_{k_A}(t) \in D, then also t \in D
+
+avoid by sending sig_{k_A}(hash(t)) instead of sig_{k_A}(t)
+
+---------- protocol with signature:
+     
+A -> B: sig_{k_A}(encA_{k_B}(A,N_A))
+B -> A: sig_{k_B}(encA_{k_A}(B,N_A))
+
+ATTACK:
+A -> B sig_{k_A}(encA_{k_B}(A,N_A))
+
+     B -> C sig_{k_A}(encA_{k_C}(A,N_A)) -- Bob cannot get this signed term
+     
+     attack like this does not work anymore
+     
+PROVING SECURITY? --> later in lecture     
+    
+    
+Second Protocol:
+----------------
+
+A -> B: encA_{k_B}(A,B,N^1_A,N^2_A)
+B -> A: encA_{k_A}(B,A,N^1_A,N_B)
+
+usage:
+A -> B encS_{[N^2_A,N_B]}(video-stream)
+
+Attack? Let's use Bob as MITM
+
+A -> B: encA_{k_B}(A,B,N^1_A,N^2_A)
+A -> C: encA_{k_C}(A,C,N^3_A,N^4_A)
+     B -> C: encA_{k_C}(A,C,N^1_A,N^2_A)
+     B <- C: encA_{k_A}(C,A,N^1_A,N_C)
+A <- B: encA_{k_A}(C,A,N^1_A,N_C) 
+does not match, Alice will not follow the protocol further.
+
+assumption: alice also has running session with charlie.
+last message will still "fail" because of different nonces
+
+nonces are used for:
+  - key establishment (nonces are good keys)
+  - session matching (session ids)
+
+     
+
+

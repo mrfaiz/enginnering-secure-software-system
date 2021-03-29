@@ -1,0 +1,13 @@
+(* hello.pv: Hello World Script *)
+
+free c:channel.
+
+free Plain:bitstring [private].
+free RSA:bitstring [private].
+
+query attacker(RSA).
+query attacker(Plain).
+
+process
+	out(c,RSA);
+	0

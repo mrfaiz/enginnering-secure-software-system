@@ -1,0 +1,6 @@
+ESSS November 10, 2020
+----------------------
+
+automata models: "tcs model" less expressive, easier to analyze
+
+limits: we will run into the halting problem

@@ -1,0 +1,114 @@
+(* this is one of the two broken authentication protocols from the first exercise:
+
+ A -> B: (A, enc^a_{kB}(NA))
+ B -> A: (B, enc^a_{kA}(NA))
+ 
+ From then on, A and B use N_A as sesssion key. We model this by letting 
+ A encrypt the value FAIL with N_A after the protocol run completed:
+ 
+ A -> B: enc^s_{NA, FAIL}
+
+ To be able to model this encryption, we let our symmetric encryption use arbitrary bitstrings as keys.
+*)
+
+(* (deterministic, i.e., non-randomized) asymmetric encryption, key always first argument
+
+Why deterministic? We know that is less secure than randomized encryption.
+
+What are the disadvantages of deterministic encryption? What can the ADV do here that she cannot do with randomized encryption?
+
+ adversary can compare 
+   - two different encryptions (say, Alice and Bob encrypting the same plaintext for Chalie)
+   - a ciphertext to a self-generated encyrption of a known term (e.g., encA(k_B)(ATTACK))
+   
+ there is no notion of a "fresh encryption," making replay attacks easier  
+ 
+ different encryptions:
+ 
+ A1: (A, enc^a_{kB}(NA))
+ 
+ ADV delivers this message to two Bob instances, B1 and B2.
+ 
+ B1, B2: generate same encyrption if we use deterministic encryption (would not be the case for randomized encryption)
+ 
+ (false argument): ADV gets more information in the deterministic case, since comparison of Bob's messages (from B1 and B2) tells her that
+                   these are encryptions of the same plaintext. 
+                   
+ Argument is "false:" ADV "learns" that B1 and B2 encrypt the same plaintext. This is no new information for the ADV: The ADV delivered the same
+                      message (from Alice) to B1 and B2, so of course they work with the same plaintext (nonce NA). 
+
+*)
+
+type skey.
+type pkey.
+fun pk(skey): pkey.
+fun aenc(pkey, bitstring): bitstring.
+reduc forall m: bitstring, sk: skey; adec(sk, aenc(pk(sk), m)) = m.
+
+(* symmetric encryption *)
+
+fun senc(bitstring, bitstring): bitstring.
+reduc forall m: bitstring, k:bitstring; sdec(k, senc(k,m)) = m. 
+
+(* channel *)
+free c:channel.
+free FAIL:bitstring[private].
+
+(* security property *)
+query attacker(FAIL).
+
+(* A -> B: (A, enc^a_{kB}(NA))
+   B -> A: (B, enc^a_{kA}(NA)) 
+   A -> B: enc^s_{NA, FAIL}
+   *)
+
+let clientA(pkA:pkey, skA:skey, pkB:pkey) =
+    new NA:bitstring;
+    out(c, (pkA, aenc(pkB, NA)));
+    in(c, x:bitstring); (* "bug": Alice gets a pair from Bob, where the second component is the ciphertext. *)
+    let y = adec(skA, x) in
+      let (=pkB, =NA) = y in
+       out(c, senc(NA,FAIL)).
+       
+let clientB(pkB:pkey, skB:skey, pkA:pkey) =
+   in(c, x: bitstring);
+   let (=pkA, y:bitstring) = x in
+     let NA = adec(skB, y) in
+       out (c, aenc(pkB, NA)). (* "bug": Bob also constructs an encrypted pair, similar to Alice's expectation. *)
+       
+(* we actually modeled a more secure (?) version of the protocol
+   A -> B: (A, enc^a_{kB}(NA))
+   B -> A: (enc^a_{kA}(B, NA)) 
+   A -> B: enc^s_{NA, FAIL}
+   *)
+   
+process
+    new skA:skey;
+    new skB:skey;
+    new skC:skey;
+    let pkA = pk(skA) in 
+      let pkB = pk(skB) in 
+        let pkC = pk(skC) in
+          out(c, pkA);
+          out(c, pkB);
+          out(c, pkC);
+          out(c, skC);
+          (!clientA(pkA, skA, pkB) | !clientB(pkB, skB, pkA) | !clientA(pkA, skA, pkC) | !clientB(pkB, skB, pkC) )
+          
+(* Without replications: ProVerif verifies this as secure, even though from the exercise class 01 we expect it to be insecure. *)
+
+(* With replications and sessions between Alice/Bob and Charlie: ProVerif detects the attack.
+   ISSUE: ADV gets FAIL-constant because that's what the protocol does: Alice's "partner" gets access to FAIL.
+   Even if the protocol were secure, this modeling would still be insecure.
+   
+   Fix: Alice should only release the FAIl constant in a session with somebody else than ADV.
+   
+   Recall exercise about modeling NS as input to "unbounded insecure": interface for adversary with starting sessions between Alice/Bob/Chalie,
+   some of these sessions are "relevant", others are not.
+   
+   For a good example: See 06_needham_schroeder_02.pv
+*)          
+
+
+    
+      

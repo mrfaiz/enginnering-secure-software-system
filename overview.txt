@@ -1,0 +1,10 @@
+
+* DY(S): Dolev Yao clousers can be used to check if a message is deriable from adversary knowledge in Polynomial Time. 
+* By DY(S) advarsary unable to knows the content of particular messages. That's why we need Indistinguisibility. 
+* Parsing lemma used to proof RT theorem
+* RT proof: used to show that a simple protocols can be analyzed in NP time. 
+* Undecidability of Unbounded Insecure: Some problem's can not be decidable
+* Undecidability problems can be solved by Incomplete Algorithms ( Horn Cluse, FO logic)
+* Proverif works with Horn or FO logics under the hood.
+
+

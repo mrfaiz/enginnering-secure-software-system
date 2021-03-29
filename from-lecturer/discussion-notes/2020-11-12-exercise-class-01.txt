@@ -1,0 +1,54 @@
+ESSS exercise November 12, 2020
+-------------------------------
+
+3-message authentication protocol:
+
+Alice:
+  1. Send "A" to Bob
+  2. Receive encrypted message (with k_A)
+  3. decrypt, and encrypt & send for Bob (with k_B)
+  
+2-message authentication protocol:
+
+banking protocol:
+
+whatsapp authentication protocol:
+
+WhatsApp authentication
+
+mechanisms - crypto primitives:
+  encryption?
+  signatures?
+  
+First session with phone number: establish secret shared key k_{hs,WA}  
+  
+  
+  
+Website  -- QR Code --> Browser -- QR Code --> Phone App  
+
+What if Charlie (ADV) gets the QR code? Browser gets access to Charlie's WA
+
+My Phone App: Treat QR Code as N_{WA}^2
+              Required: Coupling with ...
+              
+              After session establishment:
+              
+              Browser  <--> WA Website <--> Phone App
+              
+main assumptions:
+  - trusted public key
+  - "secure" phone network
+
+usage:
+  - key generated in first session used to authenticate later sessions
+  
+FIRST EXAMPLE PROTOCOL
+
+
+SECOND EXAMPLE PROTOCOL
+
+goal? use (N_A,N_B), or N_A, or N_B as symmetric key.
+measures? encryption, challenge-response
+issues? encryptions should bind nonces, names B 
+        Bob decrypts everything "for alice" 
+

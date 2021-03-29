@@ -1,0 +1,18 @@
+(* strong_secrecy.pv: Strong Secrecy Properties in ProVerif *)
+
+free secret1:bitstring[private].
+free secret2:bitstring[private].
+
+free c: channel.
+
+let clientAlice(which:bool) =
+    out(c, secret1);
+    if which then
+       out(c, secret1)
+    else
+       out(c, secret2).
+    
+
+process
+     clientAlice(choice[true,false])
+  

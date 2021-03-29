@@ -1,0 +1,38 @@
+(* randomized_encryption.pv: Randomized Public-Key Encryption in ProVerif *)
+
+type skey.
+type pkey.
+type coins.
+fun pk (skey): pkey.
+fun internalaenc(bitstring, pkey, coins): bitstring.
+
+reduc forall m:bitstring, k:skey, r:coins; adec(internalaenc(m,pk(k),r),k)=m.
+
+letfun aenc(x:bitstring, y:pkey) = new r:coins; internalaenc(x,y,r).
+
+reduc forall m:bitstring, pk:pkey, r:coins; getkey(internalaenc(m,pk,r))=pk.
+
+
+(* Just a demo application that sends an encryption of FAIL around. *)
+
+free c:channel.
+free FAIL:bitstring[private].
+query attacker(FAIL).
+
+let clientA(pkA:pkey,skA:skey,pkB:pkey) =
+ out(c, pkA);
+ let y = aenc(FAIL, pkB) in out(c, y).
+ 
+let serverB(pkA:pkey,pkB:pkey,skB:skey) =
+  in(c, y:bitstring);
+  let x = adec(y, skB) in
+  out(c, y).
+ 
+process
+  new skA:skey;
+  new skB:skey;
+  let pkA = pk(skA) in out(c, pkA);
+  let pkB = pk(skB) in out(c, pkB);
+    clientA(pkA,skA,pkB) | serverB(pkA,pkB,skB)
+  
+  

@@ -1,0 +1,42 @@
+(* Difference to version 01:
+  - we use injective events
+  - we replicate receiver and sender processes (otherwise, injective events do not make a difference
+*)  
+
+(* Symmetric key encryption *)
+
+type key.
+fun senc(bitstring, key): bitstring.
+reduc forall m: bitstring, k: key; sdec(senc(m,k),k) = m.
+
+free m:bitstring.
+free kAB:key [private].
+
+event messageSend(bitstring).
+event messageAccept(bitstring).
+
+channel c.
+
+(* Express Security property with events. *)
+
+
+query m:bitstring; inj-event(messageAccept(m)) ==> inj-event(messageSend(m)).
+
+let instanceSender() =
+  new NA:bitstring;
+  event messageSend(m);  
+  out(c, senc(NA, kAB));
+  in (c, x:bitstring);
+  let (ciphertext:bitstring,=NA) = x in
+    out(c, sdec(ciphertext,kAB)).
+  
+let instanceReceiver() =
+  new NB:bitstring;
+  in (c, x:bitstring);
+  let NA = sdec(x,kAB) in
+    out(c,(senc(NB, kAB), NA));
+    in (c,=NB);
+    event messageAccept(m).
+
+process
+    !instanceSender() | !instanceReceiver()

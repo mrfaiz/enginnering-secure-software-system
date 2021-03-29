@@ -1,0 +1,83 @@
+(*
+There are three versions of this protocol:
+  - 01: single session with events, does not allow to find the security issue
+  - 02: multiple sessions (replication) with inj-events, finds the issue
+  - 03: modeling without events (using secrecy of FAIL instead), as mentioned in the task
+        description, this version is a bit unnatural and serves mainly as a demonstration
+        of that using secrecy instead of events is often possible, but you really should use 
+        events for properties like this.
+*) 
+
+(* Symmetric key encryption *)
+
+type key.
+fun senc(bitstring, key): bitstring.
+reduc forall m: bitstring, k: key; sdec(senc(m,k),k) = m.
+
+free m:bitstring.
+free kAB:key [private].
+
+event messageSend(bitstring).
+event messageAccept(bitstring).
+
+channel c.
+
+(* Express Security property with events. *)
+   
+query m:bitstring; event(messageAccept(m)) ==> event(messageSend(m)).
+
+let instanceSender() =
+  new NA:bitstring;
+  event messageSend(m);  
+  out(c, senc(NA, kAB));
+  in (c, x:bitstring);
+  let (ciphertext:bitstring,=NA) = x in
+    out(c, sdec(ciphertext,kAB)).
+  
+let instanceReceiver() =
+  new NB:bitstring;
+  in (c, x:bitstring);
+  let NA = sdec(x,kAB) in
+    out(c,(senc(NB, kAB), NA));
+    in (c,=NB);
+    event messageAccept(m).
+
+process
+    new NC:bitstring;
+    out (c, NC);
+    instanceSender() | instanceReceiver()
+
+(*
+Issue: If we have 10 copies of Alice/Bob, then the security property only says that if there is "some" messageAccept
+event, then there also was "some" messageSend event. 
+
+Protocol run: 
+Alice1: messageSend
+
+..
+
+Bob1: messageAccept
+Bob2: messageAccept
+Bob3: messageAccept
+Bob4: messageAccept
+
+ProVerif analysis result (with events): RESULT event(messageAccept(m_31)) ==> event(messageSend(m_31)) is true.
+
+ProVerif analysis result (with inj-events):
+RESULT inj-event(messageAccept(m_31)) ==> inj-event(messageSend(m_31)) is false.
+RESULT (but event(messageAccept(m_229)) ==> event(messageSend(m_229)) is true.)
+
+*)    
+
+(* Without replication, but with inj-events:
+  - there is only one sender, one receiver
+     - exactly one messageSend event (if sender is activated by adv), at most one messageAccept event
+  - security property still "counts numbers of events" (injective events)
+     -counting cannot "go wrong", since there is at most one messageAccept event (situation with "lots of Bobs" cannot occur)
+     
+ProVerif message:
+
+Error: injective events should always be under a replication. (Otherwise,
+the injective property is a trivial consequence of the non-injective one.)
+
+*)

@@ -1,0 +1,24 @@
+ESSS November 24, 2020: Discussion Session Dolev-Yao Computation
+----------------------------------------------------------------
+
+Review Questions (about slides from video)
+
+  - Slide "Algorithm for Derive"
+  
+  - m: FAIL
+    S: {encA_{k_C}(FAIL), 
+        encA_{k_C}{encA_{k_A}(encA_{k_B}(FAIL))
+        ^k_C, ^k_A, ^k_B
+        }
+        
+    (at least) two derivations of FAIL.
+    
+    First rule application: L_d (encA_{k_C}{encA_{k_A}(encA_{k_B}(FAIL)))
+                               t=encA_{k_C}{encA_{k_A}(encA_{k_B}(FAIL))
+                               t in Sub(S)
+    
+brute force:
+  vote_B: term like "cdu, spd, fdp", all in initial adversary knowledge
+  N_A: models a freshly generated nonce, not part of adversary knowledge
+  
+  I = {k_C, ^k_C, yes, no, request, cdu, spd, fdp ...}

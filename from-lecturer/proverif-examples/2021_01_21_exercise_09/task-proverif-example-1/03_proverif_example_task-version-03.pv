@@ -1,0 +1,38 @@
+(* Modeling without events: 
+   to test whether Alice can finish the protocol without Bob participating at all, we change the setting as follows: 
+    - we remove Bob (i.e., do not start the receiver process) 
+    - at the end of Alice's protocol run, she releases the FAIL constant.
+   a similar modeling can be done to check whether Bob can finish the protocol without Alice's participation.
+*)
+
+(* Symmetric key encryption *)
+
+type key.
+fun senc(bitstring, key): bitstring.
+reduc forall m: bitstring, k: key; sdec(senc(m,k),k) = m.
+
+free m:bitstring.
+free kAB:key [private].
+free FAIL:bitstring [private].
+
+channel c.
+
+query attacker(FAIL).
+
+let instanceSender() =
+  new NA:bitstring;
+  out(c, senc(NA, kAB));
+  in (c, x:bitstring);
+  let (ciphertext:bitstring,=NA) = x in
+    out(c, sdec(ciphertext,kAB));
+    out(c, FAIL).
+  
+let instanceReceiver() =
+  new NB:bitstring;
+  in (c, x:bitstring);
+  let NA = sdec(x,kAB) in
+    out(c,(senc(NB, kAB), NA));
+    in (c,=NB).
+
+process
+    !instanceSender() (* | instanceReceiver() *)

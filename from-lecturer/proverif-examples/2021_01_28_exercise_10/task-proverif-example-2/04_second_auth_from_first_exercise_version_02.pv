@@ -1,0 +1,56 @@
+(* Fixed version of the protocol *)
+
+(* asymmetric encryption, key always first argument *)
+
+type skey.
+type pkey.
+fun pk(skey): pkey.
+fun aenc(pkey, bitstring): bitstring.
+reduc forall m: bitstring, sk: skey; adec(sk, aenc(pk(sk), m)) = m.
+
+(* symmetric encryption *)
+
+fun senc(bitstring, bitstring): bitstring.
+reduc forall m: bitstring, k:bitstring; sdec(k, senc(k,m)) = m. 
+
+(* channel *)
+free c:channel.
+free FAIL:bitstring[private].
+
+(* names *)
+free A:bitstring.
+free B:bitstring.
+free C:bitstring.
+
+(* security property *)
+query attacker(FAIL).
+
+let clientA(pkA:pkey, skA:skey, idA:bitstring, pkB:pkey, idB:bitstring) =
+    new NA:bitstring;
+    out(c, (aenc(pkB, (NA, idA, idB))));
+    in(c, x:bitstring);
+    let msgDec = adec(skA,x) in
+      let (=idA, =idB, =NA, NB:bitstring) = msgDec in
+        out(c, senc((NA,NB),FAIL)).
+       
+let clientB(pkB:pkey, skB:skey, idB:bitstring, pkA:pkey, idA:bitstring) =
+   new NB:bitstring;
+   in(c, msg1:bitstring);
+   let msgDec = adec(skB, msg1) in 
+     let (NA:bitstring, =idA, =idB) = msgDec in
+       out(c, aenc(pkA,(idA, idB, NA, NB))).
+   
+process
+    new skA:skey;
+    new skB:skey;
+    new skC:skey;
+    let pkA = pk(skA) in 
+      let pkB = pk(skB) in 
+        let pkC = pk(skC) in
+          out(c, pkA);
+          out(c, pkB);
+          out(c, pkC);
+          out(c, skC);
+          (!clientA(pkA, skA, A, pkB, B) | !clientB(pkB, skB, B, pkA, A))
+    
+      

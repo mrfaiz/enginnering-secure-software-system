@@ -1,0 +1,28 @@
+ESSS November 24, 2020
+----------------------
+
+Review Questions (about slides from previous lectures)
+ 
+  - Slide "Definition: Receive / Send Actions"
+    1st rule: insecure, we send the key around
+    2nd rule: cannot be implemented, because it breaks all ciphers
+    3rd rule: essentially allows arbitrary access to key
+    4th rule: breaks hash, cannot be implemented
+    5th rule: sends private key
+  
+  - Slide "Definition: Substitutions"
+    what if Alice and Bob both use "x"?
+  
+  - Slide "Matching: Applying Receive/Send Actions"  
+  
+  - Slide "Matching: Example"
+  
+  - Slide "Formal Protocol Definition"
+  
+  - Slide "Formal Representation of Needham-Schroeder I"  
+  
+  - Slide "Protocol Model"    
+  
+"Live Examples"
+
+    

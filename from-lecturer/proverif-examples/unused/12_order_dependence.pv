@@ -1,0 +1,30 @@
+(* order_dependence.pv: Depending on the placement of new NB, analysis successful or not *)
+
+(* difference: "cannot be proved" / "is false" *)
+
+type key.
+fun senc(key, bitstring): bitstring.
+reduc forall m: bitstring, k: key; sdec(k,senc(k,m)) = m.
+
+free c:channel.
+free FAIL:bitstring [private].
+free VALUE:bitstring.
+
+
+query attacker(FAIL).
+
+let client(kServer:key) =
+
+   in (c, y:bitstring);
+   let (x:bitstring) = (sdec(kServer, y)) in 
+     new NB: bitstring;
+     out(c, (senc(kServer,NB), x));
+     
+     in (c, z:bitstring);
+     if z = NB then
+       out(c, FAIL).
+
+process
+  new kServer:key;
+  out (c,senc(kServer, VALUE));
+  !client(kServer)

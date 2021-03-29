@@ -1,0 +1,10 @@
+ESSS December 8, 2020: Discussion Session Parsing Lemma Proof
+-------------------------------------------------------------
+
+Review Questions (about slides from video):
+    
+   - Proof of Parsing Lemma:
+     - Why does it suffices to only prove derivability of the terms the adversary sends (i.e., why do we not need to discuss the FAIL constant)?
+     - Why do we know that the last rule in the derivation of σ(x) can be assumed to be a compostion rule?
+     - Why can we assume that the derivation of sigma(r_j) contains no step L_d(sigma(x))?
+   
